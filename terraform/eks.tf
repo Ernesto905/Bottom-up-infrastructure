@@ -10,6 +10,7 @@ module "eks" {
       most_recent = true
     }
     kube-proxy = {
+      resolve_conflicts        = "OVERWRITE" 
       most_recent = true
     }
     vpc-cni = {
@@ -18,7 +19,7 @@ module "eks" {
   }
 
   vpc_id                   = module.vpc.vpc_id
-  subnet_ids               = module.vpc.private_subnets
+  # subnet_ids               = module.vpc.private_subnets
   control_plane_subnet_ids = module.vpc.intra_subnets
 
   # EKS Managed Node Group(s)
@@ -30,18 +31,35 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    ascode-cluster-wg = {
+    red_blue = {
       min_size     = 1
       max_size     = 2
       desired_size = 1
+      subnet_ids = [module.vpc.private_subnets[0]] 
 
-      instance_types = ["t3.large"]
+      instance_types = ["t3.small"]
       capacity_type  = "SPOT"
 
       tags = {
-        ExtraTag = "helloworld"
+        node_group_name = "Red and Blue"
       }
     }
+
+    black_white = {
+      min_size     = 1
+      max_size     = 2
+      desired_size = 1
+      subnet_ids = [module.vpc.private_subnets[1]] 
+
+
+      instance_types = ["t3.small"]
+      capacity_type  = "SPOT"
+
+      tags = {
+        node_group_name = "Black and White"
+      }
+    }
+
   }
 
   tags = local.tags
