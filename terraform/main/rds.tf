@@ -5,7 +5,7 @@ data "aws_secretsmanager_secret" "password" {
 }
 
 data "aws_secretsmanager_secret_version" "password" {
-  secret_id = data.aws_secretsmanager_secret.password
+  secret_id = data.aws_secretsmanager_secret.password.id
 }
 
 // Database  
@@ -24,5 +24,5 @@ module "rds" {
   max_allocated_storage = 75 
 
   username = "dbadmin"
-  password = data.aws_secretsmanager_secret_version.password
+  password = data.aws_secretsmanager_secret_version.password.id
 }
